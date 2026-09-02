@@ -1,5 +1,8 @@
-# Config-Kotlin
+<div align="center">
+<img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/48535ec5-ae9c-4b7c-84ba-f9f8a22ec846" />
+</div>
 
+------
 Repositório de configuração e automação para desenvolvimento **Android com Kotlin + Jetpack Compose** utilizando o **Visual Studio Code** como editor principal.
 
 ## Proposta
@@ -23,7 +26,7 @@ O objetivo deste repositório é ajudar desenvolvedores a configurar um ambiente
 ## Estrutura do Repositório
 
 ```text
-Config-Kotlin/
+Android_Config/
 ├── readme.md
 └── script/
     ├── linux/
