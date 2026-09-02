@@ -1,7 +1,6 @@
-set -e
 #!/bin/bash
+set -e
 
-# Cores
 RED='\033[91m'
 GREEN='\033[92m'
 YELLOW='\033[93m'
@@ -17,7 +16,7 @@ echo -e "${CYAN}╚════════════════════�
 echo
 
 # ─── Java ────────────────────────────────────────────────────────────────────
-echo -e "${YELLOW}[1/6] Verificando Java...${RESET}"
+echo -e "${YELLOW}[1/7] Verificando Java...${RESET}"
 if ! java -version &>/dev/null; then
     echo -e "${RED}  ✗ Java nao encontrado. Instale o JDK 17:${RESET}"
     echo -e "${WHITE}    https://adoptium.net${RESET}"
@@ -27,25 +26,40 @@ else
 fi
 echo
 
+# ─── Kotlin ──────────────────────────────────────────────────────────────────
+echo -e "${YELLOW}[2/7] Verificando Kotlin...${RESET}"
+if ! kotlinc -version &>/dev/null; then
+    echo -e "${YELLOW}  ⚠ kotlinc nao encontrado globalmente (normal em projetos Android).${RESET}"
+    echo -e "${WHITE}    O Kotlin e gerenciado pelo Gradle no projeto Android.${RESET}"
+else
+    KOTLIN_VERSION=$(kotlinc -version 2>&1 | head -n 1)
+    echo -e "${GREEN}  ✓ Kotlin encontrado: $KOTLIN_VERSION${RESET}"
+fi
+echo
+
 # ─── ADB ─────────────────────────────────────────────────────────────────────
-echo -e "${YELLOW}[2/6] Verificando ADB...${RESET}"
+echo -e "${YELLOW}[3/7] Verificando ADB...${RESET}"
 if ! adb --version &>/dev/null; then
     echo -e "${RED}  ✗ ADB nao encontrado. Verifique o Android SDK.${RESET}"
 else
-    echo -e "${GREEN}  ✓ ADB encontrado${RESET}"
+    ADB_VERSION=$(adb --version | head -n 1)
+    echo -e "${GREEN}  ✓ $ADB_VERSION${RESET}"
 fi
 echo
 
 # ─── ANDROID_HOME ────────────────────────────────────────────────────────────
-echo -e "${YELLOW}[3/6] Verificando ANDROID_HOME...${RESET}"
+echo -e "${YELLOW}[4/7] Verificando ANDROID_HOME...${RESET}"
 if [ -z "$ANDROID_HOME" ]; then
     echo -e "${RED}  ✗ ANDROID_HOME nao definido.${RESET}"
     echo -e "${WHITE}    Adicionando automaticamente ao ~/.bashrc...${RESET}"
-    echo '' >> ~/.bashrc
-    echo 'export ANDROID_HOME=$HOME/Android/Sdk' >> ~/.bashrc
-    echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools' >> ~/.bashrc
-    echo 'export PATH=$PATH:$ANDROID_HOME/emulator' >> ~/.bashrc
-    echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> ~/.bashrc
+    {
+        echo ''
+        echo '# Android SDK'
+        echo 'export ANDROID_HOME=$HOME/Android/Sdk'
+        echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools'
+        echo 'export PATH=$PATH:$ANDROID_HOME/emulator'
+        echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'
+    } >> ~/.bashrc
     export ANDROID_HOME=$HOME/Android/Sdk
     echo -e "${GREEN}  ✓ ANDROID_HOME definido: $ANDROID_HOME${RESET}"
     echo -e "${WHITE}    Execute: source ~/.bashrc${RESET}"
@@ -55,17 +69,24 @@ fi
 echo
 
 # ─── PATH ────────────────────────────────────────────────────────────────────
-echo -e "${YELLOW}[4/6] Configurando PATH do Android SDK...${RESET}"
-echo -e "${GREEN}  ✓ platform-tools adicionado${RESET}"
-echo -e "${GREEN}  ✓ emulator adicionado${RESET}"
-echo -e "${GREEN}  ✓ cmdline-tools adicionado${RESET}"
+echo -e "${YELLOW}[5/7] Verificando PATH do Android SDK...${RESET}"
+for TOOL in platform-tools emulator "cmdline-tools/latest/bin"; do
+    TOOL_PATH="$ANDROID_HOME/$TOOL"
+    if [ -d "$TOOL_PATH" ]; then
+        echo -e "${GREEN}  ✓ $TOOL encontrado${RESET}"
+    else
+        echo -e "${YELLOW}  ⚠ $TOOL nao encontrado em $TOOL_PATH${RESET}"
+    fi
+done
 echo
 
 # ─── Gradle Wrapper ──────────────────────────────────────────────────────────
-echo -e "${YELLOW}[5/6] Verificando Gradle Wrapper...${RESET}"
+echo -e "${YELLOW}[6/7] Verificando Gradle Wrapper...${RESET}"
 if [ -f "./gradlew" ]; then
     chmod +x ./gradlew
+    GRADLE_VERSION=$(./gradlew --version 2>/dev/null | grep "Gradle" | head -n 1)
     echo -e "${GREEN}  ✓ gradlew encontrado e permissao concedida${RESET}"
+    echo -e "${GREEN}  ✓ $GRADLE_VERSION${RESET}"
 else
     echo -e "${RED}  ✗ gradlew nao encontrado nesta pasta.${RESET}"
     echo -e "${WHITE}    Execute este script dentro da pasta do projeto.${RESET}"
@@ -73,7 +94,7 @@ fi
 echo
 
 # ─── Dispositivos ────────────────────────────────────────────────────────────
-echo -e "${YELLOW}[6/6] Dispositivos conectados:${RESET}"
+echo -e "${YELLOW}[7/7] Dispositivos conectados:${RESET}"
 adb devices 2>/dev/null
 echo
 
@@ -123,6 +144,7 @@ echo -e "${WHITE}      debugImplementation(\"androidx.compose.ui:ui-test-manifes
 echo -e "${WHITE}  }${RESET}"
 echo
 
+# ─── Extensoes VS Code ───────────────────────────────────────────────────────
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${RESET}"
 echo -e "${CYAN}║           Extensoes VS Code                          ║${RESET}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${RESET}"
@@ -143,3 +165,4 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║              Setup concluido!                        ║${RESET}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════╝${RESET}"
 echo
+read -p "Pressione Enter para sair..."

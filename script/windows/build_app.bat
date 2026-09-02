@@ -8,12 +8,20 @@ set "CYAN=[96m"
 set "WHITE=[97m"
 set "RESET=[0m"
 
-set "PROJECT_DIR=C:\Users\%USERNAME%\meu-projeto"
-cd /d "%PROJECT_DIR%"
-
+cls
 echo %CYAN%╔══════════════════════════════════════════════════════╗%RESET%
 echo %CYAN%║            Building Android App                      ║%RESET%
 echo %CYAN%╚══════════════════════════════════════════════════════╝%RESET%
+echo.
+
+:: ─── Detectar pasta do projeto ───────────────────────────────────────────────
+if not exist "gradlew.bat" (
+    echo %RED%  ✗ gradlew.bat nao encontrado em: %CD%%RESET%
+    echo %WHITE%    Execute este script dentro da pasta do projeto.%RESET%
+    pause
+    exit /b 1
+)
+echo %GREEN%  ✓ Projeto encontrado: %CD%%RESET%
 echo.
 
 :: ─── Limpar build anterior ───────────────────────────────────────────────────
@@ -32,8 +40,8 @@ echo %YELLOW%[2/3] Compilando APK Debug...%RESET%
 call gradlew.bat assembleDebug
 if %errorlevel% neq 0 (
     echo %RED%  ✗ BUILD FAILED!%RESET%
-    echo %WHITE%  Execute para ver detalhes do erro:%RESET%
-    echo %WHITE%    .\gradlew.bat assembleDebug --stacktrace%RESET%
+    echo %WHITE%    Execute para ver detalhes:%RESET%
+    echo %WHITE%      .\gradlew.bat assembleDebug --stacktrace%RESET%
     pause
     exit /b 1
 )
@@ -44,10 +52,11 @@ echo %YELLOW%[3/3] Verificando APK...%RESET%
 set "APK=app\build\outputs\apk\debug\app-debug.apk"
 if exist "%APK%" (
     echo %GREEN%  ✓ BUILD SUCCESSFUL!%RESET%
-    echo %GREEN%  ✓ APK gerado em:%RESET%
-    echo %WHITE%    %APK%%RESET%
+    echo %GREEN%  ✓ APK gerado em: %APK%%RESET%
 ) else (
     echo %RED%  ✗ APK nao encontrado.%RESET%
+    pause
+    exit /b 1
 )
 echo.
 
@@ -58,7 +67,7 @@ echo %CYAN%╚══════════════════════
 echo.
 adb devices
 echo.
-set /p INSTALAR=%YELLOW%Deseja instalar o APK no dispositivo? (s/n): %RESET%
+set /p INSTALAR=Deseja instalar o APK no dispositivo? (s/n): 
 if /i "%INSTALAR%"=="s" (
     adb install "%APK%"
     if %errorlevel% neq 0 (
@@ -74,5 +83,7 @@ echo %WHITE%  Outros comandos uteis:%RESET%
 echo %WHITE%    .\gradlew.bat assembleRelease    :: Build versao Release%RESET%
 echo %WHITE%    .\gradlew.bat installDebug       :: Instala no dispositivo conectado%RESET%
 echo %WHITE%    .\gradlew.bat build              :: Build completo com testes%RESET%
+echo %WHITE%    .\gradlew.bat test               :: Executa testes unitarios%RESET%
+echo %WHITE%    .\gradlew.bat lint               :: Analisa qualidade do codigo%RESET%
 echo.
 pause

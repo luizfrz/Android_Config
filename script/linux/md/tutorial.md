@@ -201,19 +201,3 @@ Depois instale o APK:
 ```bash
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
-
-###  Requisito
-
-| Ferramenta             | Necessário                   |
-| ---------------------- | ---------------------------- |
-| JDK 17                 | Sim                          |
-| Android Studio         | Sim                          |
-| Android SDK            | Sim                          |
-| Android Build Tools    | Sim                          |
-| Android Platform Tools | Sim                          |
-| Jetpack Compose BOM    | Sim                          |
-| Gradle Wrapper         | Geralmente já vem no projeto |
-| Emulador Android       | Opcional                     |
-| Dispositivo Android    | Opcional                     |
-| ---------------------- | ---------------------------- |
-

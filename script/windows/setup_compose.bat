@@ -16,7 +16,7 @@ echo %CYAN%╚══════════════════════
 echo.
 
 :: ─── Java ───────────────────────────────────────────────────────────────────
-echo %YELLOW%[1/6] Verificando Java...%RESET%
+echo %YELLOW%[1/7] Verificando Java...%RESET%
 java -version >nul 2>&1
 if %errorlevel% neq 0 (
     echo %RED%  ✗ Java nao encontrado. Instale o JDK 17:%RESET%
@@ -28,18 +28,31 @@ if %errorlevel% neq 0 (
 )
 echo.
 
+:: ─── Kotlin ──────────────────────────────────────────────────────────────────
+echo %YELLOW%[2/7] Verificando Kotlin...%RESET%
+kotlinc -version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %YELLOW%  ⚠ kotlinc nao encontrado globalmente (normal em projetos Android).%RESET%
+    echo %WHITE%    O Kotlin e gerenciado pelo Gradle no projeto Android.%RESET%
+) else (
+    echo %GREEN%  ✓ Kotlin encontrado%RESET%
+)
+echo.
+
 :: ─── ADB ────────────────────────────────────────────────────────────────────
-echo %YELLOW%[2/6] Verificando ADB...%RESET%
+echo %YELLOW%[3/7] Verificando ADB...%RESET%
 adb --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo %RED%  ✗ ADB nao encontrado. Verifique o Android SDK.%RESET%
 ) else (
-    echo %GREEN%  ✓ ADB encontrado%RESET%
+    for /f "tokens=1,2,3" %%a in ('adb --version 2^>^&1 ^| findstr /i "version"') do (
+        echo %GREEN%  ✓ ADB encontrado: %%a %%b %%c%RESET%
+    )
 )
 echo.
 
 :: ─── ANDROID_HOME ───────────────────────────────────────────────────────────
-echo %YELLOW%[3/6] Verificando ANDROID_HOME...%RESET%
+echo %YELLOW%[4/7] Verificando ANDROID_HOME...%RESET%
 if "%ANDROID_HOME%"=="" (
     echo %RED%  ✗ ANDROID_HOME nao definido.%RESET%
     echo %WHITE%    Adicionando automaticamente...%RESET%
@@ -51,18 +64,33 @@ if "%ANDROID_HOME%"=="" (
 )
 echo.
 
-:: ─── PATH ───────────────────────────────────────────────────────────────────
-echo %YELLOW%[4/6] Configurando PATH do Android SDK...%RESET%
+:: ─── PATH e pastas do SDK ────────────────────────────────────────────────────
+echo %YELLOW%[5/7] Verificando pastas do Android SDK...%RESET%
 setx PATH "%PATH%;%ANDROID_HOME%\platform-tools;%ANDROID_HOME%\emulator;%ANDROID_HOME%\cmdline-tools\latest\bin" >nul
-echo %GREEN%  ✓ platform-tools adicionado%RESET%
-echo %GREEN%  ✓ emulator adicionado%RESET%
-echo %GREEN%  ✓ cmdline-tools adicionado%RESET%
+
+if exist "%ANDROID_HOME%\platform-tools" (
+    echo %GREEN%  ✓ platform-tools encontrado%RESET%
+) else (
+    echo %YELLOW%  ⚠ platform-tools nao encontrado em %ANDROID_HOME%\platform-tools%RESET%
+)
+if exist "%ANDROID_HOME%\emulator" (
+    echo %GREEN%  ✓ emulator encontrado%RESET%
+) else (
+    echo %YELLOW%  ⚠ emulator nao encontrado em %ANDROID_HOME%\emulator%RESET%
+)
+if exist "%ANDROID_HOME%\cmdline-tools\latest\bin" (
+    echo %GREEN%  ✓ cmdline-tools encontrado%RESET%
+) else (
+    echo %YELLOW%  ⚠ cmdline-tools nao encontrado em %ANDROID_HOME%\cmdline-tools\latest\bin%RESET%
+)
 echo.
 
 :: ─── Gradle Wrapper ─────────────────────────────────────────────────────────
-echo %YELLOW%[5/6] Verificando Gradle Wrapper...%RESET%
+echo %YELLOW%[6/7] Verificando Gradle Wrapper...%RESET%
 if exist "gradlew.bat" (
-    echo %GREEN%  ✓ gradlew.bat encontrado%RESET%
+    for /f "tokens=*" %%v in ('call gradlew.bat --version 2^>nul ^| findstr /i "Gradle"') do (
+        echo %GREEN%  ✓ %%v%RESET%
+    )
 ) else (
     echo %RED%  ✗ gradlew.bat nao encontrado nesta pasta.%RESET%
     echo %WHITE%    Execute este script dentro da pasta do projeto.%RESET%
@@ -70,7 +98,7 @@ if exist "gradlew.bat" (
 echo.
 
 :: ─── Dispositivos ───────────────────────────────────────────────────────────
-echo %YELLOW%[6/6] Dispositivos conectados:%RESET%
+echo %YELLOW%[7/7] Dispositivos conectados:%RESET%
 adb devices 2>nul
 echo.
 
