@@ -22,8 +22,6 @@ Exemplo:
 openjdk version "17.x.x"
 ```
 
----
-
 ### 2. Android SDK
 
 É necessário instalar o Android SDK para compilar e executar o aplicativo.
@@ -58,8 +56,6 @@ Mesmo utilizando o VS Code como editor, é recomendado instalar o Android Studio
 
 O código pode ser desenvolvido no VS Code normalmente.
 
----
-
 ### 4. Gradle
 
 Projetos Android utilizam o **Gradle** para gerenciamento de dependências e compilação.
@@ -80,7 +76,6 @@ Windows:
 
 Se o projeto possuir `gradlew`, `gradlew.bat` e a pasta `gradle/wrapper`, prefira utilizar o Gradle Wrapper.
 
----
 
 ## 5. Variáveis de ambiente
 
@@ -115,8 +110,6 @@ Verifique:
 echo $ANDROID_HOME
 ```
 
----
-
 ## 6. Visual Studio Code
 
 Instale o Visual Studio Code e as extensões necessárias.
@@ -126,11 +119,8 @@ Extensões recomendadas:
 * Kotlin
 * Extension Pack for Java
 * Gradle for Java
-* Android Emulator
 
 Dependendo do projeto, algumas extensões podem não ser necessárias.
-
----
 
 ## 7. Verificar o ambiente
 
@@ -165,8 +155,6 @@ List of devices attached
 emulator-5554    device
 ```
 
----
-
 ## 8. Executar o projeto
 
 Entre na pasta do projeto:
@@ -199,8 +187,6 @@ Normalmente o APK será encontrado em:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
-
 ## 9. Executar no dispositivo ou emulador
 
 Inicie um emulador pelo Android Studio ou conecte um dispositivo Android com a depuração USB ativada.
@@ -216,46 +202,18 @@ Depois instale o APK:
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
----
+###  Requisito
 
-## Estrutura básica
-
-Um projeto Android Kotlin normalmente possui uma estrutura semelhante a:
-
-```text
-meu-projeto/
-├── app/
-│   ├── src/
-│   │   └── main/
-│   │       ├── java/
-│   │       ├── res/
-│   │       └── AndroidManifest.xml
-│   └── build.gradle.kts
-├── gradle/
-│   └── wrapper/
-├── build.gradle.kts
-├── settings.gradle.kts
-├── gradlew
-└── gradlew.bat
-```
-## Resumo
-
-Para desenvolver Kotlin Android no VS Code, tenha instalado:
-
-| Ferramenta              | Necessário                   |
-| ----------------------- | ---------------------------- |
-| JDK 17                  | Sim                          |
-| Android SDK             | Sim                          |
-| Android SDK Platform    | Sim                          |
-| Android Build Tools     | Sim                          |
-| Android Platform Tools  | Sim                          |
-| Android Studio          | Recomendado                  |
-| VS Code                 | Sim                          |
-| Kotlin Extension        | Recomendado                  |
-| Extension Pack for Java | Recomendado                  |
-| Gradle Wrapper          | Geralmente já vem no projeto |
-| Emulador Android        | Opcional                     |
-| Dispositivo Android     | Opcional                     |
-
-> **Observação:** o VS Code funciona como editor, mas o Android Studio continua sendo muito útil para instalar e gerenciar o Android SDK, emuladores e ferramentas Android.
+| Ferramenta             | Necessário                   |
+| ---------------------- | ---------------------------- |
+| JDK 17                 | Sim                          |
+| Android Studio         | Sim                          |
+| Android SDK            | Sim                          |
+| Android Build Tools    | Sim                          |
+| Android Platform Tools | Sim                          |
+| Jetpack Compose BOM    | Sim                          |
+| Gradle Wrapper         | Geralmente já vem no projeto |
+| Emulador Android       | Opcional                     |
+| Dispositivo Android    | Opcional                     |
+| ---------------------- | ---------------------------- |
 
