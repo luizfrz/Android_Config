@@ -1,60 +1,155 @@
-# Config-Kotlin
+<div align="center">
+<img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/48535ec5-ae9c-4b7c-84ba-f9f8a22ec846" />
+</div>
 
-Repositório de configuração e automação para desenvolvimento Android com Kotlin + Jetpack Compose, usando Visual Studio Code como editor principal.
+------
+Repositório de configuração e automação para desenvolvimento **Android com Kotlin + Jetpack Compose** utilizando o **Visual Studio Code** como editor principal.
 
 ## Proposta
 
-Este repositório auxilia desenvolvedores a preparar um ambiente Android completo sem depender exclusivamente do Android Studio como editor. Contém scripts e tutoriais para desenvolver apps Kotlin + Jetpack Compose no VS Code, usando o Android Studio apenas para instalar e gerenciar o SDK, emuladores e ferramentas quando necessário.
+O objetivo deste repositório é ajudar desenvolvedores a configurar um ambiente Android completo sem depender exclusivamente do Android Studio como editor. Através de scripts automatizados e tutoriais detalhados, é possível desenvolver aplicativos Android com Kotlin e Jetpack Compose diretamente no VS Code, utilizando o Android Studio apenas para gerenciar o SDK, emuladores e ferramentas Android.
 
 ---
 
-## Estrutura recomendada
+## Por que usar o VS Code?
 
-```
+* Editor leve e altamente customizável
+* Suporte a Kotlin via extensões
+* Integração com Gradle via terminal
+* Funciona em Linux, macOS e Windows
+* Ideal para quem já usa o VS Code em outros projetos
+
+> O Android Studio continua sendo necessário para instalar e gerenciar o Android SDK, Build Tools, emuladores e AVDs.
+
+---
+
+## Estrutura do Repositório
+
+```text
 Config-Kotlin/
 ├── README.md
-├── docs/                 # Tutoriais e guias consolidados
-├── script/               # Scripts de automação por SO
+├── docs/
+│   ├── command/
+│   │   ├── commands.md
+│   │   └── guia_android.md
 │   ├── linux/
+│   │   └── tutorial-linux.md
 │   └── windows/
+│       └── tutorial-windows.md
+├── script/
+│   ├── linux/
+│   │   ├── build_app.sh
+│   │   ├── fix_vscode.sh
+│   │   └── setup_compose.sh
+│   └── windows/
+│       ├── build_app.bat
+│       ├── fix_vscode.bat
+│       └── setup_compose.bat
 ```
+
+---
 
 ## Scripts
 
-Os scripts em `script/` facilitam configuração e build (Linux/Windows).
+### `setup_compose` (Linux / Windows)
 
-Principais scripts:
+Configura automaticamente o ambiente de desenvolvimento Android + Jetpack Compose.
 
-- `setup_compose.sh` / `setup_compose.bat` — configura o ambiente para Jetpack Compose
-- `build_app.sh` / `build_app.bat` — automatiza build e instalação do APK
-- `fix_vscode.sh` / `fix_vscode.bat` — ajustes para VS Code
+O que faz:
+- Verifica se o Java JDK 17 está instalado
+- Verifica se o ADB está disponível
+- Define e exporta o `ANDROID_HOME` automaticamente se não estiver configurado
+- Adiciona `platform-tools`, `emulator` e `cmdline-tools` ao PATH
+- Verifica o Gradle Wrapper do projeto
+- Lista dispositivos conectados
+- Exibe todas as dependências Jetpack Compose prontas para o `build.gradle.kts`
+- Lista as extensões recomendadas para o VS Code
 
-Antes de executar, verifique e ajuste variáveis como `PROJECT_DIR` dentro dos scripts.
+Linux:
+```bash
+chmod +x script/linux/setup_compose.sh
+./script/linux/setup_compose.sh
+```
 
-## Tutoriais consolidados
-
-Os tutoriais completos foram movidos para a pasta `docs/`:
-
-- [Guia Android Studio](docs/guia_android.md)
-- [Tutorial Linux — Configuração Kotlin + Android no VS Code](docs/tutorial-linux.md)
-- [Tutorial Windows — Configuração Kotlin + Android no VS Code](docs/tutorial-windows.md)
-- [Comandos úteis / Debug / scrcpy](docs/commands.md)
-
-## Requisitos
-
-- JDK 17
-- Android Studio (para SDK, emuladores e AVDs)
-- Android SDK / Build Tools / Platform Tools
-- VS Code
-
-## Extensões VS Code recomendadas
-
-- Kotlin: https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin
-- Java Dependency: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency
-- Java Test: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test
-- Gradle for Java: https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle
-- Android Emulator: https://marketplace.visualstudio.com/items?itemName=DiemasMichiels.emulate
+Windows:
+```bat
+script\windows\setup_compose.bat
+```
 
 ---
 
-Para detalhes de configuração passo a passo, veja os tutoriais em `docs/`.
+### `build_app` (Linux / Windows)
+
+Automatiza o processo de build e instalação do APK no dispositivo ou emulador.
+
+O que faz:
+- Limpa o build anterior com `gradlew clean`
+- Compila o APK Debug com `gradlew assembleDebug`
+- Verifica se o APK foi gerado com sucesso
+- Lista dispositivos conectados via ADB
+- Pergunta se deseja instalar o APK no dispositivo
+
+Linux:
+```bash
+chmod +x script/linux/build_app.sh
+./script/linux/build_app.sh
+```
+
+Windows:
+```bat
+script\windows\build_app.bat
+```
+
+> Antes de executar, ajuste o `PROJECT_DIR` dentro do script para o caminho do seu projeto.
+
+---
+
+## Tutoriais
+
+Cada sistema operacional possui um tutorial detalhado com todos os passos necessários:
+
+| Tutorial | Caminho |
+| -------- | ------- |
+| Linux    | `script/linux/tutorial.md` |
+| Windows  | `script/windows/tutorial.md` |
+
+Os tutoriais cobrem:
+
+1. Instalação do JDK 17
+2. Instalação do Android Studio e Android SDK
+3. Configuração das variáveis de ambiente
+4. Instalação do VS Code e extensões recomendadas
+5. Verificação do ambiente
+6. Criação de projeto Kotlin + Jetpack Compose
+7. Dependências do Jetpack Compose no `build.gradle.kts`
+8. Compilação e geração do APK
+9. Instalação no dispositivo ou emulador
+
+---
+
+## Requisitos
+
+| Ferramenta             | Necessário                   |
+| ---------------------- | ---------------------------- |
+| JDK 17                 | Sim                          |
+| Android Studio         | Sim                          |
+| Android SDK            | Sim                          |
+| Android Build Tools    | Sim                          |
+| Android Platform Tools | Sim                          |
+| Jetpack Compose BOM    | Sim                          |
+| VS Code                | Sim                          |
+| Gradle Wrapper         | Geralmente já vem no projeto |
+| Emulador Android       | Opcional                     |
+| Dispositivo Android    | Opcional                     |
+
+---
+
+## Extensões VS Code Recomendadas
+
+| Extensão            | Link |
+| ------------------- | ---- |
+| Kotlin              | https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin |
+| Java Dependency     | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency |
+| Java Test           | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test |
+| Gradle for Java     | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle |
+| Android Emulator    | https://marketplace.visualstudio.com/items?itemName=DiemasMichiels.emulate |
