@@ -1,17 +1,20 @@
-## Guia android studio
+## Guia Android Studio
 
+Referências e recursos úteis para trabalhar com Android Studio e Jetpack Compose.
 
-### Estrutura de pastas
+### Ativar modo desenvolvedor
+- https://www.android.com/intl/pt_br/articles/como-ativar-o-modo-desenvolvedor/
 
-https://www.android.com/intl/pt_br/articles/como-ativar-o-modo-desenvolvedor/
+### Criar um projeto (Android Studio)
+- https://developer.android.com/studio/projects/create-project?hl=pt-br
 
-### Criar um projeto
-https://developer.android.com/studio/projects/create-project?hl=pt-br
+### Configuração da IDE
+- Documentação do Android Studio: https://developer.android.com/studio
 
+### Material Design / Jetpack Compose
+- Componentes Compose: https://developer.android.com/develop/ui/compose/components
 
-### Configuração de IDE
-https://developer.android.com/studio/projects/create-project?hl=pt-br
-
-
-#### Material Design
-https://developer.android.com/develop/ui/compose/components?_gl=1*13k6oxo*_ga*NjY1NzMxNDQ3LjE3ODgzNTIwODY.*_ga_QPQ2NRV856*czE3ODgzNTIwODYkbzEkZzEkdDE3ODgzNTIxMDAkajQ2JGwwJGgw
+### Tutoriais locais (neste repositório)
+- Tutorial Linux: [docs/tutorial-linux.md](docs/tutorial-linux.md)
+- Tutorial Windows: [docs/tutorial-windows.md](docs/tutorial-windows.md)
+- Comandos úteis: [docs/commands.md](docs/commands.md)

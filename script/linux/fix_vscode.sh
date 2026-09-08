@@ -41,8 +41,11 @@ EXTENSIONS=(
 
 for EXT in "${EXTENSIONS[@]}"; do
     echo -e "${WHITE}    Instalando $EXT...${RESET}"
-    code --install-extension "$EXT" --force &>/dev/null
-    echo -e "${GREEN}  ✓ $EXT instalado${RESET}"
+    if code --install-extension "$EXT" --force &>/dev/null; then
+        echo -e "${GREEN}  ✓ $EXT instalado${RESET}"
+    else
+        echo -e "${YELLOW}  ⚠ Falha ao instalar $EXT. Verifique conexao e permissao do VS Code CLI.${RESET}"
+    fi
 done
 echo
 

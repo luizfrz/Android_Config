@@ -36,7 +36,8 @@ echo -e "${YELLOW}[2/3] Compilando APK Debug...${RESET}"
 if ./gradlew assembleDebug; then
     echo
     echo -e "${YELLOW}[3/3] Verificando APK...${RESET}"
-    APK=$(find app/build/outputs/apk/debug -name "*.apk" 2>/dev/null | head -n 1)
+    # Procurar APK em qualquer modulo do projeto (cobre nomes de modulo personalizados)
+    APK=$(find . -type f -path "*/build/outputs/apk/*/debug/*.apk" 2>/dev/null | head -n 1)
     if [ -n "$APK" ]; then
         echo -e "${GREEN}  ✓ BUILD SUCCESSFUL!${RESET}"
         echo -e "${GREEN}  ✓ APK gerado em: $APK${RESET}"
@@ -61,7 +62,9 @@ adb devices 2>/dev/null
 echo
 read -p "$(echo -e "${YELLOW}Deseja instalar o APK no dispositivo? (s/n): ${RESET}")" INSTALAR
 if [[ "$INSTALAR" =~ ^[sS]$ ]]; then
-    if adb install "$APK"; then
+    if ! command -v adb &>/dev/null; then
+        echo -e "${RED}  ✗ adb nao encontrado. Instale o Android SDK e/adicione ao PATH.${RESET}"
+    elif adb install "$APK"; then
         echo -e "${GREEN}  ✓ APK instalado com sucesso!${RESET}"
     else
         echo -e "${RED}  ✗ Erro ao instalar o APK.${RESET}"

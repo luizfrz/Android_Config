@@ -51,18 +51,29 @@ echo
 echo -e "${YELLOW}[4/7] Verificando ANDROID_HOME...${RESET}"
 if [ -z "$ANDROID_HOME" ]; then
     echo -e "${RED}  ✗ ANDROID_HOME nao definido.${RESET}"
-    echo -e "${WHITE}    Adicionando automaticamente ao ~/.bashrc...${RESET}"
-    {
-        echo ''
-        echo '# Android SDK'
-        echo 'export ANDROID_HOME=$HOME/Android/Sdk'
-        echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools'
-        echo 'export PATH=$PATH:$ANDROID_HOME/emulator'
-        echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'
-    } >> ~/.bashrc
+    # Detectar arquivo RC do usuario (bash/zsh)
+    if [ -n "${ZSH_VERSION-}" ] || [[ "$SHELL" == *"zsh"* ]]; then
+        RC_FILE="$HOME/.zshrc"
+    else
+        RC_FILE="$HOME/.bashrc"
+    fi
+    echo -e "${WHITE}    Adicionando sugerido ao $RC_FILE (se nao existir) ...${RESET}"
+    if ! grep -q "ANDROID_HOME" "$RC_FILE" 2>/dev/null; then
+        {
+            echo ''
+            echo '# Android SDK'
+            echo 'export ANDROID_HOME=$HOME/Android/Sdk'
+            echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools'
+            echo 'export PATH=$PATH:$ANDROID_HOME/emulator'
+            echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin'
+        } >> "$RC_FILE"
+        echo -e "${GREEN}  ✓ Entradas adicionadas em: $RC_FILE${RESET}"
+    else
+        echo -e "${YELLOW}  ⚠ $RC_FILE já contém ANDROID_HOME. Nenhuma alteração feita.${RESET}"
+    fi
     export ANDROID_HOME=$HOME/Android/Sdk
-    echo -e "${GREEN}  ✓ ANDROID_HOME definido: $ANDROID_HOME${RESET}"
-    echo -e "${WHITE}    Execute: source ~/.bashrc${RESET}"
+    echo -e "${GREEN}  ✓ ANDROID_HOME definido (temporario): $ANDROID_HOME${RESET}"
+    echo -e "${WHITE}    Para tornar permanente: source $RC_FILE${RESET}"
 else
     echo -e "${GREEN}  ✓ ANDROID_HOME = $ANDROID_HOME${RESET}"
 fi
