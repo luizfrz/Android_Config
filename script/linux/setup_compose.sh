@@ -17,12 +17,17 @@ echo
 
 # ─── Java ────────────────────────────────────────────────────────────────────
 echo -e "${YELLOW}[1/7] Verificando Java...${RESET}"
-if ! java -version &>/dev/null; then
+if ! command -v java &>/dev/null; then
     echo -e "${RED}  ✗ Java nao encontrado. Instale o JDK 17:${RESET}"
     echo -e "${WHITE}    https://adoptium.net${RESET}"
 else
     VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
     echo -e "${GREEN}  ✓ Java encontrado: $VERSION${RESET}"
+    if ! command -v javac &>/dev/null; then
+        echo -e "${YELLOW}  ⚠ javac nao encontrado: instale um JDK completo para Gradle/Android.${RESET}"
+    else
+        echo -e "${GREEN}  ✓ JDK completo encontrado: $(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")${RESET}"
+    fi
 fi
 echo
 
@@ -155,12 +160,41 @@ echo -e "${WHITE}      debugImplementation(\"androidx.compose.ui:ui-test-manifes
 echo -e "${WHITE}  }${RESET}"
 echo
 
+# --- VS Code: colorizacao Kotlin + Jetpack Compose --------------------------
+echo -e "${YELLOW}Configurando colorizacao global para Kotlin + Jetpack Compose...${RESET}"
+if command -v code &>/dev/null; then
+    EXTENSIONS=(
+        "mathiasfrohlich.Kotlin"
+        "vscjava.vscode-gradle"
+        "vscjava.vscode-java-pack"
+        "PKief.material-icon-theme"
+    )
+
+    code --uninstall-extension fwcd.kotlin >/dev/null 2>&1 || true
+
+    for EXTENSION in "${EXTENSIONS[@]}"; do
+        if code --install-extension "$EXTENSION" --force >/dev/null 2>&1; then
+            echo -e "${GREEN}  ✓ Extensao instalada: $EXTENSION${RESET}"
+        else
+            echo -e "${YELLOW}  ⚠ Nao foi possivel instalar: $EXTENSION${RESET}"
+        fi
+    done
+
+    echo -e "${GREEN}  ✓ Arquivos .kt e .kts usam a linguagem Kotlin.${RESET}"
+    echo -e "${WHITE}    Se necessario, use: Ctrl+Shift+P > Developer: Reload Window${RESET}"
+else
+    echo -e "${YELLOW}  ⚠ Comando 'code' nao encontrado no PATH.${RESET}"
+    echo -e "${WHITE}    Abra o VS Code e instale as extensoes listadas abaixo manualmente.${RESET}"
+fi
+echo
+
 # ─── Extensoes VS Code ───────────────────────────────────────────────────────
 echo -e "${CYAN}╔══════════════════════════════════════════════════════╗${RESET}"
 echo -e "${CYAN}║           Extensoes VS Code                          ║${RESET}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════╝${RESET}"
 echo
 echo -e "${MAGENTA}  Kotlin:${RESET}"
+echo -e "${WHITE}    Extensao de sintaxe: mathiasfrohlich.Kotlin${RESET}"
 echo -e "${WHITE}    https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin${RESET}"
 echo -e "${MAGENTA}  Java Dependency:${RESET}"
 echo -e "${WHITE}    https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency${RESET}"

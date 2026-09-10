@@ -25,6 +25,12 @@ if %errorlevel% neq 0 (
     for /f "tokens=3" %%v in ('java -version 2^>^&1 ^| findstr /i "version"') do (
         echo %GREEN%  ✓ Java encontrado: %%v%RESET%
     )
+    javac -version >nul 2>&1
+    if errorlevel 1 (
+        echo %YELLOW%  ⚠ javac nao encontrado: instale um JDK completo para Gradle/Android.%RESET%
+    ) else (
+        for /f "tokens=*" %%v in ('javac -version 2^>^&1') do echo %GREEN%  ✓ JDK completo encontrado: %%v%RESET%
+    )
 )
 echo.
 
@@ -59,6 +65,7 @@ if "%ANDROID_HOME%"=="" (
     setx ANDROID_HOME "%LOCALAPPDATA%\Android\Sdk" >nul
     set "ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk"
     echo %GREEN%  ✓ ANDROID_HOME definido: %ANDROID_HOME%%RESET%
+    echo %WHITE%    A variavel foi salva permanentemente para novos terminais.%RESET%
 ) else (
     echo %GREEN%  ✓ ANDROID_HOME = %ANDROID_HOME%%RESET%
 )
@@ -67,6 +74,7 @@ echo.
 :: ─── PATH e pastas do SDK ────────────────────────────────────────────────────
 echo %YELLOW%[5/7] Verificando pastas do Android SDK...%RESET%
 setx PATH "%PATH%;%ANDROID_HOME%\platform-tools;%ANDROID_HOME%\emulator;%ANDROID_HOME%\cmdline-tools\latest\bin" >nul
+set "PATH=%PATH%;%ANDROID_HOME%\platform-tools;%ANDROID_HOME%\emulator;%ANDROID_HOME%\cmdline-tools\latest\bin"
 
 if exist "%ANDROID_HOME%\platform-tools" (
     echo %GREEN%  ✓ platform-tools encontrado%RESET%
@@ -148,6 +156,23 @@ echo %WHITE%      debugImplementation("androidx.compose.ui:ui-test-manifest")%RE
 echo %WHITE%  }%RESET%
 echo.
 
+:: ─── VS Code: colorizacao Kotlin + Jetpack Compose ──────────────────────────
+echo %YELLOW%Configurando colorizacao global para Kotlin + Jetpack Compose...%RESET%
+where code >nul 2>&1
+if errorlevel 1 (
+    echo %YELLOW%  ⚠ Comando 'code' nao encontrado no PATH.%RESET%
+    echo %WHITE%    Abra o VS Code e instale as extensoes listadas abaixo manualmente.%RESET%
+) else (
+    code --uninstall-extension fwcd.kotlin >nul 2>&1
+    call :install_extension mathiasfrohlich.Kotlin
+    call :install_extension vscjava.vscode-gradle
+    call :install_extension vscjava.vscode-java-pack
+    call :install_extension PKief.material-icon-theme
+    echo %GREEN%  ✓ Arquivos .kt e .kts usam a linguagem Kotlin.%RESET%
+    echo %WHITE%    Se necessario, use: Ctrl+Shift+P ^> Developer: Reload Window%RESET%
+)
+echo.
+
 :: ─── Extensoes VS Code ──────────────────────────────────────────────────────
 echo %CYAN%╔══════════════════════════════════════════════════════╗%RESET%
 echo %CYAN%║           Extensoes VS Code                          ║%RESET%
@@ -170,3 +195,13 @@ echo %GREEN%║              Setup concluido!                        ║%RESET%
 echo %GREEN%╚══════════════════════════════════════════════════════╝%RESET%
 echo.
 pause
+exit /b 0
+
+:install_extension
+code --install-extension %~1 --force >nul 2>&1
+if errorlevel 1 (
+    echo %YELLOW%  ⚠ Nao foi possivel instalar: %~1%RESET%
+) else (
+    echo %GREEN%  ✓ Extensao instalada: %~1%RESET%
+)
+exit /b 0
