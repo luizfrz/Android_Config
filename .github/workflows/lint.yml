@@ -1,0 +1,37 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: bash -n
+        run: for f in scripts/linux/*.sh scripts/linux/lib/*.sh; do bash -n "$f"; done
+      - name: shellcheck
+        run: shellcheck -x -P SCRIPTDIR -S style scripts/linux/*.sh scripts/linux/lib/*.sh
+
+  line-endings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: .sh must be LF, .bat must be CRLF
+        run: |
+          set -e
+          if grep -rlI $'\r' --include='*.sh' .; then echo "CRLF em .sh"; exit 1; fi
+          for f in $(git ls-files '*.bat'); do
+            if grep -qv $'\r$' "$f"; then echo "LF sem CR em $f"; exit 1; fi
+          done
+
+  json-toml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate templates
+        run: |
+          python3 -c "import json,sys; [json.load(open(f)) for f in sys.argv[1:]]" templates/vscode/*.json
+          python3 -c "import tomllib; tomllib.load(open('templates/gradle/libs.versions.toml','rb'))"

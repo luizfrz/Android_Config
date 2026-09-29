@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "mathiasfrohlich.Kotlin",
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
+        "DiemasMichiels.emulate"
+    ],
+    "unwantedRecommendations": [
+        "fwcd.kotlin"
+    ]
+}

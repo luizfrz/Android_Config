@@ -1,155 +1,152 @@
 <div align="center">
-<img width="300" height="200" alt="image" src="https://github.com/user-attachments/assets/48535ec5-ae9c-4b7c-84ba-f9f8a22ec846" />
+<img width="300" height="200" alt="Android + Kotlin + VS Code" src="https://github.com/user-attachments/assets/48535ec5-ae9c-4b7c-84ba-f9f8a22ec846" />
+
+# Android_Config
+
+Scripts, templates e documentação para desenvolvimento **Android com Kotlin + Jetpack Compose** usando **VS Code** como editor e **Gradle CLI** como sistema de build.
+
+![lint](https://github.com/luizfrz/Android_Config/actions/workflows/lint.yml/badge.svg)
 </div>
 
-------
-Repositório de configuração e automação para desenvolvimento **Android com Kotlin + Jetpack Compose** utilizando o **Visual Studio Code** como editor principal.
-
-## Proposta
-
-O objetivo deste repositório é ajudar desenvolvedores a configurar um ambiente Android completo sem depender exclusivamente do Android Studio como editor. Através de scripts automatizados e tutoriais detalhados, é possível desenvolver aplicativos Android com Kotlin e Jetpack Compose diretamente no VS Code, utilizando o Android Studio apenas para gerenciar o SDK, emuladores e ferramentas Android.
-
 ---
 
-## Por que usar o VS Code?
-
-* Editor leve e altamente customizável
-* Suporte a Kotlin via extensões
-* Integração com Gradle via terminal
-* Funciona em Linux, macOS e Windows
-* Ideal para quem já usa o VS Code em outros projetos
-
-> O Android Studio continua sendo necessário para instalar e gerenciar o Android SDK, Build Tools, emuladores e AVDs.
-
----
-
-## Estrutura do Repositório
+## Arquitetura do ambiente
 
 ```text
-Config-Kotlin/
-├── README.md
-├── docs/
-│   ├── command/
-│   │   ├── commands.md
-│   │   └── guia_android.md
-│   ├── linux/
-│   │   └── tutorial-linux.md
-│   └── windows/
-│       └── tutorial-windows.md
-├── script/
-│   ├── linux/
-│   │   ├── build_app.sh
-│   │   ├── fix_vscode.sh
-│   │   └── setup_compose.sh
-│   └── windows/
-│       ├── build_app.bat
-│       ├── fix_vscode.bat
-│       └── setup_compose.bat
+┌──────────────┐   edita    ┌─────────────────┐  ./gradlew   ┌───────────────┐   adb    ┌─────────────┐
+│   VS Code    │ ─────────▶ │ Projeto Android │ ───────────▶ │ AGP + Kotlin  │ ───────▶ │ Device/AVD  │
+│ (extensões)  │            │ (Kotlin DSL)    │              │ (JDK 17)      │  install │             │
+└──────────────┘            └─────────────────┘              └───────┬───────┘          └─────────────┘
+                                                                     │ ANDROID_HOME
+                                                             ┌───────▼───────┐
+                                                             │  Android SDK  │ ◀── Android Studio / sdkmanager
+                                                             └───────────────┘
 ```
 
----
-
-## Scripts
-
-### `setup_compose` (Linux / Windows)
-
-Configura automaticamente o ambiente de desenvolvimento Android + Jetpack Compose.
-
-O que faz:
-- Verifica se o Java JDK 17 está instalado
-- Verifica se o ADB está disponível
-- Define e exporta o `ANDROID_HOME` automaticamente se não estiver configurado
-- Adiciona `platform-tools`, `emulator` e `cmdline-tools` ao PATH
-- Verifica o Gradle Wrapper do projeto
-- Lista dispositivos conectados
-- Exibe todas as dependências Jetpack Compose prontas para o `build.gradle.kts`
-- Lista as extensões recomendadas para o VS Code
-
-Linux:
-```bash
-chmod +x script/linux/setup_compose.sh
-./script/linux/setup_compose.sh
-```
-
-Windows:
-```bat
-script\windows\setup_compose.bat
-```
-
----
-
-### `build_app` (Linux / Windows)
-
-Automatiza o processo de build e instalação do APK no dispositivo ou emulador.
-
-O que faz:
-- Limpa o build anterior com `gradlew clean`
-- Compila o APK Debug com `gradlew assembleDebug`
-- Verifica se o APK foi gerado com sucesso
-- Lista dispositivos conectados via ADB
-- Pergunta se deseja instalar o APK no dispositivo
-
-Linux:
-```bash
-chmod +x script/linux/build_app.sh
-./script/linux/build_app.sh
-```
-
-Windows:
-```bat
-script\windows\build_app.bat
-```
-
-> Antes de executar, ajuste o `PROJECT_DIR` dentro do script para o caminho do seu projeto.
-
----
-
-## Tutoriais
-
-Cada sistema operacional possui um tutorial detalhado com todos os passos necessários:
-
-| Tutorial | Caminho |
-| -------- | ------- |
-| Linux    | `script/linux/tutorial.md` |
-| Windows  | `script/windows/tutorial.md` |
-
-Os tutoriais cobrem:
-
-1. Instalação do JDK 17
-2. Instalação do Android Studio e Android SDK
-3. Configuração das variáveis de ambiente
-4. Instalação do VS Code e extensões recomendadas
-5. Verificação do ambiente
-6. Criação de projeto Kotlin + Jetpack Compose
-7. Dependências do Jetpack Compose no `build.gradle.kts`
-8. Compilação e geração do APK
-9. Instalação no dispositivo ou emulador
-
----
+O Android Studio é usado apenas para gerenciar SDK, emuladores e AVDs; edição, build e deploy acontecem fora dele.
 
 ## Requisitos
 
-| Ferramenta             | Necessário                   |
-| ---------------------- | ---------------------------- |
-| JDK 17                 | Sim                          |
-| Android Studio         | Sim                          |
-| Android SDK            | Sim                          |
-| Android Build Tools    | Sim                          |
-| Android Platform Tools | Sim                          |
-| Jetpack Compose BOM    | Sim                          |
-| VS Code                | Sim                          |
-| Gradle Wrapper         | Geralmente já vem no projeto |
-| Emulador Android       | Opcional                     |
-| Dispositivo Android    | Opcional                     |
+| Componente | Versão | Obrigatório |
+| ---------- | ------ | ----------- |
+| JDK | 17 (requisito do AGP 8.x) | Sim |
+| Android SDK Platform | = `compileSdk` do projeto | Sim |
+| Android SDK Build-Tools / Platform-Tools | latest | Sim |
+| Android SDK Command-line Tools | latest | Recomendado |
+| Android Studio | qualquer recente | Recomendado (gerência do SDK) |
+| VS Code + CLI `code` no PATH | qualquer recente | Sim |
+| Gradle | via wrapper do projeto (`gradlew`) | Sim |
+| Android Emulator ou device físico | — | Para executar |
 
----
+Sistemas suportados: Linux (bash 4+) e Windows 10 1511+ / 11.
 
-## Extensões VS Code Recomendadas
+## Quick start
 
-| Extensão            | Link |
-| ------------------- | ---- |
-| Kotlin              | https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin |
-| Java Dependency     | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency |
-| Java Test           | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test |
-| Gradle for Java     | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle |
-| Android Emulator    | https://marketplace.visualstudio.com/items?itemName=DiemasMichiels.emulate |
+```bash
+git clone https://github.com/luizfrz/Android_Config.git
+cd meu-projeto-android
+
+# Linux
+../Android_Config/scripts/linux/setup-env.sh         # valida JDK/SDK/ADB, ajusta ANDROID_HOME, instala extensões
+../Android_Config/scripts/linux/configure-vscode.sh  # .vscode/ + .editorconfig no projeto
+../Android_Config/scripts/linux/build-apk.sh -i      # assembleDebug + adb install
+```
+
+```bat
+:: Windows
+..\Android_Config\scripts\windows\setup-env.bat
+..\Android_Config\scripts\windows\configure-vscode.bat
+..\Android_Config\scripts\windows\build-apk.bat /install
+```
+
+Todos os scripts aceitam o diretório do projeto como argumento (padrão: diretório atual) e `--help` / `/?`.
+
+## Estrutura
+
+```text
+Android_Config/
+├── README.md
+├── .editorconfig                  # estilo deste repositório
+├── .gitattributes                 # LF para .sh, CRLF para .bat
+├── .github/workflows/lint.yml     # shellcheck, finais de linha, validação dos templates
+├── docs/
+│   ├── README.md                  # índice
+│   ├── setup/
+│   │   ├── linux.md
+│   │   └── windows.md
+│   ├── reference/
+│   │   ├── gradle-compose.md      # toolchain, Compose compiler, version catalog
+│   │   ├── vscode.md              # extensões e settings
+│   │   ├── adb-cli.md             # adb, logcat, emulador, scrcpy
+│   │   └── links.md
+│   └── troubleshooting.md
+├── scripts/
+│   ├── linux/
+│   │   ├── lib/common.sh          # cores, logging, install_file com backup
+│   │   ├── setup-env.sh
+│   │   ├── build-apk.sh
+│   │   └── configure-vscode.sh
+│   └── windows/
+│       ├── lib/colors.bat
+│       ├── setup-env.bat
+│       ├── build-apk.bat
+│       └── configure-vscode.bat
+└── templates/                     # fonte única usada pelos scripts e pela documentação
+    ├── editorconfig
+    ├── gradle/
+    │   ├── libs.versions.toml     # version catalog (Compose BOM, Hilt, Room, Retrofit, Coil…)
+    │   └── app.build.gradle.kts   # módulo app com Kotlin 2.0 + plugin compose + KSP
+    └── vscode/
+        ├── extensions.json
+        └── settings.json
+```
+
+## Scripts
+
+### `setup-env` — validação e configuração do ambiente
+
+| Etapa | Verificação / ação |
+| ----- | ------------------ |
+| 1 | `java` ≥ 17 e presença de `javac` (JDK completo), `JAVA_HOME` |
+| 2 | `kotlinc` (opcional — o Kotlin do projeto vem do Gradle) |
+| 3 | `ANDROID_HOME`; se ausente, define e persiste (`~/.bashrc`/`~/.zshrc` ou variável de usuário no Windows) |
+| 4 | `platform-tools`, `emulator`, `cmdline-tools/latest/bin`, `build-tools`, `platforms` |
+| 5 | `adb` |
+| 6 | `gradlew` e `gradle/libs.versions.toml` no projeto |
+| 7 | `adb devices -l` |
+| — | Instala extensões de `templates/vscode/extensions.json` e remove `fwcd.kotlin` |
+
+Sai com código `1` se houver erro bloqueante (sem JDK, sem SDK, sem ADB). Linux: `--no-rc` não altera arquivos de shell, `--no-extensions` pula o VS Code.
+
+No Windows, o `PATH` é atualizado via PowerShell apenas no escopo de **usuário** e sem duplicar entradas — evita o truncamento em 1024 caracteres do `setx`.
+
+### `build-apk` — build e deploy
+
+| Linux | Windows | Efeito |
+| ----- | ------- | ------ |
+| `-r`, `--release` | `/release` | `assembleRelease` em vez de `assembleDebug` |
+| `-i`, `--install` | `/install` | Instala sem perguntar |
+| `-n`, `--no-install` | `/noinstall` | Não instala (uso em CI) |
+| `--no-clean` | `/noclean` | Pula `gradlew clean` (builds incrementais) |
+| `-s SERIAL` | — | Device alvo (`ANDROID_SERIAL`) |
+
+Localiza o APK mais recente em `*/build/outputs/apk/**/<variant>/`, cobrindo módulos com nome customizado e product flavors. Instala com `adb install -r -t`. APKs release `*-unsigned.apk` não são instalados.
+
+### `configure-vscode` — configuração do projeto
+
+Instala as extensões e copia `templates/vscode/{settings,extensions}.json` → `.vscode/` e `templates/editorconfig` → `.editorconfig`. Arquivos existentes com conteúdo diferente são salvos como `*.bak.<timestamp>` antes de serem substituídos.
+
+## Documentação
+
+- [Setup Linux](docs/setup/linux.md) · [Setup Windows](docs/setup/windows.md)
+- [Gradle + Jetpack Compose](docs/reference/gradle-compose.md)
+- [VS Code](docs/reference/vscode.md)
+- [ADB e CLI](docs/reference/adb-cli.md)
+- [Troubleshooting](docs/troubleshooting.md)
+- [Links oficiais](docs/reference/links.md)
+
+## Contribuindo
+
+- Scripts Linux: `bash`, `set -euo pipefail`, funções de `lib/common.sh`; devem passar em `shellcheck -x -S style`.
+- Scripts Windows: CRLF (garantido pelo `.gitattributes`), sem `::` dentro de blocos `( )`, `call` ao invocar `.cmd`/`.bat` (ex.: `call code ...`).
+- Extensões e settings do VS Code são alterados **somente** em `templates/`; os scripts leem de lá.
