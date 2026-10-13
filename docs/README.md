@@ -2,6 +2,7 @@
 
 | Documento | Conteúdo |
 | --------- | -------- |
+| [architecture.md](architecture.md) | Arquitetura técnica: camadas, fluxos dos scripts, contratos e divergências conhecidas |
 | [setup/linux.md](setup/linux.md) | Instalação passo a passo no Linux (JDK, SDK, KVM, variáveis, VS Code) |
 | [setup/windows.md](setup/windows.md) | Instalação passo a passo no Windows |
 | [reference/gradle-compose.md](reference/gradle-compose.md) | Toolchain, Compose compiler, version catalog, dependências, tarefas Gradle |

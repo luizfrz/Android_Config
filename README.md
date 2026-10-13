@@ -1,26 +1,21 @@
 <div align="center">
 <img width="300" height="200" alt="Android + Kotlin + VS Code" src="https://github.com/user-attachments/assets/48535ec5-ae9c-4b7c-84ba-f9f8a22ec846" />
 
-# Android_Config
+# Android Config
 
 Scripts, templates e documentação para desenvolvimento **Android com Kotlin + Jetpack Compose** usando **VS Code** como editor e **Gradle CLI** como sistema de build.
-
-![lint](https://github.com/luizfrz/Android_Config/actions/workflows/lint.yml/badge.svg)
-</div>
 
 ---
 
 ## Arquitetura do ambiente
 
-```text
-┌──────────────┐   edita    ┌─────────────────┐  ./gradlew   ┌───────────────┐   adb    ┌─────────────┐
-│   VS Code    │ ─────────▶ │ Projeto Android │ ───────────▶ │ AGP + Kotlin  │ ───────▶ │ Device/AVD  │
-│ (extensões)  │            │ (Kotlin DSL)    │              │ (JDK 17)      │  install │             │
-└──────────────┘            └─────────────────┘              └───────┬───────┘          └─────────────┘
-                                                                     │ ANDROID_HOME
-                                                             ┌───────▼───────┐
-                                                             │  Android SDK  │ ◀── Android Studio / sdkmanager
-                                                             └───────────────┘
+```mermaid
+flowchart LR
+    VS["VS Code<br/>(extensões)"] -->|edita| PRJ["Projeto Android<br/>(Kotlin DSL)"]
+    PRJ -->|./gradlew| AGP["AGP + Kotlin<br/>(JDK 17)"]
+    AGP -->|"adb install"| DEV["Device / AVD"]
+    AGP -->|ANDROID_HOME| SDK["Android SDK"]
+    STUDIO["Android Studio / sdkmanager"] --> SDK
 ```
 
 O Android Studio é usado apenas para gerenciar SDK, emuladores e AVDs; edição, build e deploy acontecem fora dele.
@@ -68,9 +63,9 @@ Android_Config/
 ├── README.md
 ├── .editorconfig                  # estilo deste repositório
 ├── .gitattributes                 # LF para .sh, CRLF para .bat
-├── .github/workflows/lint.yml     # shellcheck, finais de linha, validação dos templates
 ├── docs/
 │   ├── README.md                  # índice
+│   ├── architecture.md            # arquitetura técnica (camadas, fluxos, contratos)
 │   ├── setup/
 │   │   ├── linux.md
 │   │   └── windows.md
@@ -87,7 +82,10 @@ Android_Config/
 │   │   ├── build-apk.sh
 │   │   └── configure-vscode.sh
 │   └── windows/
-│       ├── lib/colors.bat
+│       ├── lib/
+│       │   ├── colors.bat
+│       │   ├── build-compose-colors.ps1  # empacota a extensão compose-colors em .vsix
+│       │   └── merge-settings.ps1        # mescla settings.json do VS Code
 │       ├── setup-env.bat
 │       ├── build-apk.bat
 │       └── configure-vscode.bat
@@ -98,7 +96,11 @@ Android_Config/
     │   └── app.build.gradle.kts   # módulo app com Kotlin 2.0 + plugin compose + KSP
     └── vscode/
         ├── extensions.json
-        └── settings.json
+        ├── settings.json
+        └── compose-colors/        # extensão local: prévia de cores + realce para Compose
+            ├── extension.js
+            ├── package.json
+            └── syntaxes/compose.injection.json
 ```
 
 ## Scripts
@@ -138,6 +140,7 @@ Instala as extensões e copia `templates/vscode/{settings,extensions}.json` → 
 
 ## Documentação
 
+- [Arquitetura técnica](docs/architecture.md)
 - [Setup Linux](docs/setup/linux.md) · [Setup Windows](docs/setup/windows.md)
 - [Gradle + Jetpack Compose](docs/reference/gradle-compose.md)
 - [VS Code](docs/reference/vscode.md)
