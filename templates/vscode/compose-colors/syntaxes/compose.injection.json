@@ -1,0 +1,15 @@
+{
+  "scopeName": "source.kotlin.compose-injection",
+  "injectionSelector": "L:source.kotlin -comment -string",
+  "patterns": [
+    { "name": "entity.name.function.annotation.kotlin", "match": "(?<=@)[A-Za-z_]\\w*(?::[A-Za-z_]\\w*)?" },
+    { "match": "\\b(fun)\\s+(?:[A-Za-z_][\\w.<>]*\\.)?([A-Z]\\w*)\\b", "captures": { "1": { "name": "storage.type.kotlin" }, "2": { "name": "entity.name.function.composable.kotlin" } } },
+    { "match": "\\b(fun)\\s+(?:[A-Za-z_][\\w.<>]*\\.)?([a-z_]\\w*)\\b", "captures": { "1": { "name": "storage.type.kotlin" }, "2": { "name": "entity.name.function.declaration.kotlin" } } },
+    { "name": "entity.name.function.composable.kotlin", "match": "\\b[A-Z][A-Za-z0-9_]*(?=\\s*(?:<[^>]*>)?\\s*[({])" },
+    { "name": "variable.parameter.named-argument.kotlin", "match": "\\b[a-z_]\\w*(?=\\s*=(?!=))" },
+    { "name": "entity.name.function.call.kotlin", "match": "\\b[a-z_]\\w*(?=\\s*(?:<[^>]*>)?\\s*[({])" },
+    { "name": "variable.other.property.kotlin", "match": "(?<=\\.)[a-z_]\\w*\\b" },
+    { "name": "entity.name.type.kotlin", "match": "\\b[A-Z][A-Za-z0-9_]*\\b" },
+    { "name": "constant.other.kotlin", "match": "\\b[A-Z][A-Z0-9_]{2,}\\b" }
+  ]
+}

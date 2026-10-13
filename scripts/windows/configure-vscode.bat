@@ -1,68 +1,102 @@
 @echo off
-:: Aplica a configuracao de VS Code deste repositorio a um projeto Android:
-::   - instala extensoes (templates\vscode\extensions.json)
-::   - copia .vscode\settings.json, .vscode\extensions.json e .editorconfig
-:: Arquivos existentes e diferentes recebem backup .bak.<timestamp>.
+:: Configura o VS Code como ambiente secundario para Kotlin / Jetpack Compose.
 ::
-:: Uso: scripts\windows\configure-vscode.bat [PROJECT_DIR]
-setlocal EnableExtensions EnableDelayedExpansion
+:: Uso:  scripts\windows\configure-vscode.bat [diretorio-do-projeto-android]
+::
+:: O que faz (idempotente):
+::   1. Instala a extensao JetBrains Kotlin (LSP) + XML, TOML e EditorConfig; remove extensoes Kotlin conflitantes.
+::   2. Gera e instala a extensao local "compose-colors" (templates\vscode\compose-colors).
+::   3. Mescla configuracoes de usuario (realce, formatter, cores de tokens, JDK, TMPDIR do servidor).
+::   4. Se informado um projeto: cria local.properties (sdk.dir).
+:: Depois de rodar: FECHE o VS Code por completo e abra de novo.
+setlocal EnableExtensions
 chcp 65001 >nul
 call "%~dp0lib\colors.bat"
 
 set "TEMPLATES_DIR=%~dp0..\..\templates"
-set "PROJECT_DIR=%~f1"
-if "%~1"=="" set "PROJECT_DIR=%CD%"
-if not exist "%PROJECT_DIR%\" (
-    echo %RED%  [X] Diretorio nao existe: %PROJECT_DIR%%RESET%
-    exit /b 1
-)
-if not exist "%PROJECT_DIR%\gradlew.bat" echo %YELLOW%  [!] %PROJECT_DIR% nao parece um projeto Gradle%RESET%
+set "PROJECT=%~1"
+set "KOTLIN_TMP=%LOCALAPPDATA%\vscode-kotlin-tmp"
+set "BUILD=%LOCALAPPDATA%\compose-colors-build"
+set "USER_DIR=%APPDATA%\Code\User"
 
-echo.
-echo %CYAN%== Configurar VS Code - Kotlin Android ==%RESET%
-
-echo %YELLOW%[1/3] VS Code CLI%RESET%
+:: --- detecta VS Code ---------------------------------------------------------
 where code >nul 2>&1
 if errorlevel 1 (
     echo %RED%  [X] CLI 'code' nao encontrada. Reinstale o VS Code marcando "Add to PATH".%RESET%
     call :pause_if_interactive
     exit /b 1
 )
-for /f "tokens=1" %%v in ('call code --version 2^>nul') do (
-    echo %GREEN%  [OK] VS Code %%v%RESET%
-    goto :vscode_ok
-)
-:vscode_ok
+echo.
+echo %CYAN%== Configurar VS Code - Kotlin Android ==%RESET%
 
-echo %YELLOW%[2/3] Extensoes%RESET%
-call code --uninstall-extension fwcd.kotlin >nul 2>&1
-for /f "usebackq tokens=*" %%e in (`powershell -NoProfile -Command "(Get-Content -Raw '%TEMPLATES_DIR%\vscode\extensions.json' | ConvertFrom-Json).recommendations"`) do (
+:: --- JDK para resolucao de simbolos ------------------------------------------
+set "JDK="
+for /d %%d in ("%USERPROFILE%\.gradle\jdks\*21*") do set "JDK=%%~fd"
+if not defined JDK if defined JAVA_HOME set "JDK=%JAVA_HOME%"
+if defined JDK (echo %WHITE%>> JDK: %JDK%%RESET%) else (echo %WHITE%>> JDK: nao encontrado; ignorando%RESET%)
+
+:: --- 1. extensoes ------------------------------------------------------------
+echo %YELLOW%[1/4] Extensoes%RESET%
+for %%e in (jetbrains.kotlin-server redhat.vscode-xml tamasfe.even-better-toml editorconfig.editorconfig) do (
     call code --install-extension %%e --force >nul 2>&1
     if errorlevel 1 (echo %YELLOW%  [!] Falha ao instalar %%e%RESET%) else (echo %GREEN%  [OK] %%e%RESET%)
 )
+for %%e in (mathiasfrohlich.kotlin fwcd.kotlin) do call code --uninstall-extension %%e >nul 2>&1
 
-echo %YELLOW%[3/3] Arquivos de configuracao em %PROJECT_DIR%%RESET%
-if not exist "%PROJECT_DIR%\.vscode" mkdir "%PROJECT_DIR%\.vscode"
-call :install_file "%TEMPLATES_DIR%\vscode\settings.json"   "%PROJECT_DIR%\.vscode\settings.json"
-call :install_file "%TEMPLATES_DIR%\vscode\extensions.json" "%PROJECT_DIR%\.vscode\extensions.json"
-call :install_file "%TEMPLATES_DIR%\editorconfig"           "%PROJECT_DIR%\.editorconfig"
+:: --- 2. extensao local compose-colors ---------------------------------------
+echo %YELLOW%[2/4] Extensao compose-colors%RESET%
+if not exist "%BUILD%" mkdir "%BUILD%"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0lib\build-compose-colors.ps1" -Source "%TEMPLATES_DIR%\vscode\compose-colors" -Out "%BUILD%\compose-colors.vsix"
+if errorlevel 1 (
+    echo %RED%  [X] Falha ao gerar o .vsix%RESET%
+    call :pause_if_interactive
+    exit /b 1
+)
+call code --install-extension "%BUILD%\compose-colors.vsix" --force >nul 2>&1
+if errorlevel 1 (echo %YELLOW%  [!] Falha ao instalar compose-colors%RESET%) else (echo %GREEN%  [OK] compose-colors%RESET%)
+
+:: --- 3. configuracoes de usuario --------------------------------------------
+echo %YELLOW%[3/4] Configuracoes de usuario%RESET%
+if not exist "%USER_DIR%" mkdir "%USER_DIR%"
+if not exist "%KOTLIN_TMP%" mkdir "%KOTLIN_TMP%"
+if exist "%USER_DIR%\settings.json" (
+    for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMddHHmmss"') do copy /y "%USER_DIR%\settings.json" "%USER_DIR%\settings.json.bak.%%t" >nul
+)
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0lib\merge-settings.ps1" -Path "%USER_DIR%\settings.json" -KotlinTmp "%KOTLIN_TMP%" -Jdk "%JDK%"
+if errorlevel 1 (
+    echo %RED%  [X] Falha ao atualizar settings.json%RESET%
+    call :pause_if_interactive
+    exit /b 1
+)
+
+:: --- 4. projeto (opcional) ---------------------------------------------------
+if not "%PROJECT%"=="" (
+    echo %YELLOW%[4/4] Projeto %PROJECT%%RESET%
+    if not exist "%PROJECT%\" (
+        echo %RED%  [X] Diretorio nao existe: %PROJECT%%RESET%
+        call :pause_if_interactive
+        exit /b 1
+    )
+    set "SDK=%ANDROID_HOME%"
+    if not defined SDK set "SDK=%ANDROID_SDK_ROOT%"
+    if not defined SDK set "SDK=%LOCALAPPDATA%\Android\Sdk"
+    setlocal EnableDelayedExpansion
+    if exist "!SDK!\" (
+        set "SDK=!SDK:\=/!"
+        findstr /b /c:"sdk.dir=" "%PROJECT%\local.properties" >nul 2>&1
+        if errorlevel 1 (
+            >>"%PROJECT%\local.properties" echo sdk.dir=!SDK!
+            echo %GREEN%  [OK] local.properties: sdk.dir=!SDK!%RESET%
+        )
+    )
+    endlocal
+) else (
+    echo %YELLOW%[4/4] Projeto%RESET% %WHITE%(nenhum informado, pulando)%RESET%
+)
 
 echo.
-echo %GREEN%  [OK] Concluido. Recarregue a janela: Ctrl+Shift+P ^> Developer: Reload Window%RESET%
+echo %GREEN%  [OK] Pronto. FECHE o VS Code por completo e abra de novo; depois abra um .kt e aguarde o import do Gradle.%RESET%
 call :pause_if_interactive
-exit /b 0
-
-:install_file
-:: %1 = origem, %2 = destino. Faz backup se o destino existir e for diferente.
-if exist "%~2" (
-    fc /b "%~1" "%~2" >nul 2>&1
-    if errorlevel 1 (
-        for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMddHHmmss"') do set "TS=%%t"
-        copy /y "%~2" "%~2.bak.!TS!" >nul
-        echo %YELLOW%  [!] %~nx2 ja existia - backup em %~nx2.bak.!TS!%RESET%
-    )
-)
-copy /y "%~1" "%~2" >nul && echo %GREEN%  [OK] %~nx2%RESET%
 exit /b 0
 
 :pause_if_interactive

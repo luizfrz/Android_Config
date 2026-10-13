@@ -1,0 +1,28 @@
+{
+  "name": "compose-colors",
+  "displayName": "Compose Colors",
+  "description": "Color swatches and picker for Jetpack Compose Color(0xAARRGGBB) and Color.Red-style literals in Kotlin files.",
+  "version": "0.0.2",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:kotlin"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "source.kotlin.compose-injection",
+        "path": "./syntaxes/compose.injection.json",
+        "injectTo": [
+          "source.kotlin"
+        ]
+      }
+    ]
+  }
+}
