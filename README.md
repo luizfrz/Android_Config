@@ -25,7 +25,7 @@ O Android Studio é usado apenas para gerenciar SDK, emuladores e AVDs; edição
 | Componente | Versão | Obrigatório |
 | ---------- | ------ | ----------- |
 | JDK | 17 (requisito do AGP 8.x) | Sim |
-| Android SDK Platform | = `compileSdk` do projeto | Sim |
+| Android SDK Platform |  `compileSdk` do projeto | Sim |
 | Android SDK Build-Tools / Platform-Tools | latest | Sim |
 | Android SDK Command-line Tools | latest | Recomendado |
 | Android Studio | qualquer recente | Recomendado (gerência do SDK) |
@@ -41,70 +41,36 @@ Sistemas suportados: Linux (bash 4+) e Windows 10 1511+ / 11.
 git clone https://github.com/luizfrz/Android_Config.git
 cd meu-projeto-android
 
-# Linux
-../Android_Config/scripts/linux/setup-env.sh         # valida JDK/SDK/ADB, ajusta ANDROID_HOME, instala extensões
-../Android_Config/scripts/linux/configure-vscode.sh  # .vscode/ + .editorconfig no projeto
-../Android_Config/scripts/linux/build-apk.sh -i      # assembleDebug + adb install
 ```
+#### Linux 
+```bash 
+
+../Android_Config/scripts/linux/setup-env.sh  
+
+../Android_Config/scripts/linux/configure-vscode.sh  
+
+../Android_Config/scripts/linux/build-apk.sh -i      
+```
+#### Windows 
 
 ```bat
-:: Windows
-..\Android_Config\scripts\windows\setup-env.bat
+
+..\Android_Config\scripts\windows\setup-env.bat 
 ..\Android_Config\scripts\windows\configure-vscode.bat
 ..\Android_Config\scripts\windows\build-apk.bat /install
 ```
 
-Todos os scripts aceitam o diretório do projeto como argumento (padrão: diretório atual) e `--help` / `/?`.
-
-## Estrutura
+### Script 
 
 ```text
-Android_Config/
-├── README.md
-├── .editorconfig                  # estilo deste repositório
-├── .gitattributes                 # LF para .sh, CRLF para .bat
-├── docs/
-│   ├── README.md                  # índice
-│   ├── architecture.md            # arquitetura técnica (camadas, fluxos, contratos)
-│   ├── setup/
-│   │   ├── linux.md
-│   │   └── windows.md
-│   ├── reference/
-│   │   ├── gradle-compose.md      # toolchain, Compose compiler, version catalog
-│   │   ├── vscode.md              # extensões e settings
-│   │   ├── adb-cli.md             # adb, logcat, emulador, scrcpy
-│   │   └── links.md
-│   └── troubleshooting.md
-├── scripts/
-│   ├── linux/
-│   │   ├── lib/common.sh          # cores, logging, install_file com backup
-│   │   ├── setup-env.sh
-│   │   ├── build-apk.sh
-│   │   └── configure-vscode.sh
-│   └── windows/
-│       ├── lib/
-│       │   ├── colors.bat
-│       │   ├── build-compose-colors.ps1  # empacota a extensão compose-colors em .vsix
-│       │   └── merge-settings.ps1        # mescla settings.json do VS Code
-│       ├── setup-env.bat
-│       ├── build-apk.bat
-│       └── configure-vscode.bat
-└── templates/                     # fonte única usada pelos scripts e pela documentação
-    ├── editorconfig
-    ├── gradle/
-    │   ├── libs.versions.toml     # version catalog (Compose BOM, Hilt, Room, Retrofit, Coil…)
-    │   └── app.build.gradle.kts   # módulo app com Kotlin 2.0 + plugin compose + KSP
-    └── vscode/
-        ├── extensions.json
-        ├── settings.json
-        └── compose-colors/        # extensão local: prévia de cores + realce para Compose
-            ├── extension.js
-            ├── package.json
-            └── syntaxes/compose.injection.json
+setup-env ->  valida JDK/SDK/ADB, ajusta ANDROID_HOME, instala extensões 
+configure-vscode ->  .vscode/ + .editorconfig no projeto
+build-apk ->  /install  assembleDebug + adb install
 ```
 
-## Scripts
+Todos os scripts aceitam o diretório do projeto como argumento (padrão: diretório atual) e `--help` / `/?`.
 
+## Scripts
 ### `setup-env` — validação e configuração do ambiente
 
 | Etapa | Verificação / ação |
@@ -140,16 +106,8 @@ Instala as extensões e copia `templates/vscode/{settings,extensions}.json` → 
 
 ## Documentação
 
-- [Arquitetura técnica](docs/architecture.md)
-- [Setup Linux](docs/setup/linux.md) · [Setup Windows](docs/setup/windows.md)
-- [Gradle + Jetpack Compose](docs/reference/gradle-compose.md)
-- [VS Code](docs/reference/vscode.md)
-- [ADB e CLI](docs/reference/adb-cli.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Links oficiais](docs/reference/links.md)
+[Arquitetura técnica](docs/architecture.md)
+ [Setup Linux](docs/setup/linux.md) · [Setup Windows](docs/setup/windows.md)
+ [Gradle + Jetpack Compose](docs/reference/gradle-compose.md)
+ [VS Code](docs/reference/vscode.md)
 
-## Contribuindo
-
-- Scripts Linux: `bash`, `set -euo pipefail`, funções de `lib/common.sh`; devem passar em `shellcheck -x -S style`.
-- Scripts Windows: CRLF (garantido pelo `.gitattributes`), sem `::` dentro de blocos `( )`, `call` ao invocar `.cmd`/`.bat` (ex.: `call code ...`).
-- Extensões e settings do VS Code são alterados **somente** em `templates/`; os scripts leem de lá.
